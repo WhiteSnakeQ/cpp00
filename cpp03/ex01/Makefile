@@ -1,12 +1,24 @@
-NAME		:=	ClapTrap
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: kreys <kirrill20030@gmail.com>             +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/02/01 11:49:51 by kreys             #+#    #+#              #
+#    Updated: 2024/02/01 12:17:25 by kreys            ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+NAME		:=	ScavTrap
 
 CC			:=	c++
 
-SRCS		:=	main.cpp ClapTrap.cpp
+SRCS		:=	main.cpp ClapTrap.cpp ScavTrap.cpp
 
 OBJ			:=	$(SRCS:.cpp=.o)
 
-CFLAGS		:=	-std=c++98 -pedantic
+CFLAGS		:=	-Wall -Wextra -Werror -std=c++98
 
 all: $(NAME)
 
@@ -18,10 +30,10 @@ $(NAME): $(OBJ)
 	@${CC} ${CFLAGS} -c $< -o ${<:.cpp=.o}
 
 clean:
-	rm -fr $(OBJ)
+	@rm -fr $(OBJ)
 
 fclean: clean
-	rm -fr $(NAME)
+	@rm -fr $(NAME)
 
 re: fclean all
 
