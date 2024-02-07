@@ -14,6 +14,7 @@
 
 #define CONFIG_FILE "config.txt"
 #define PORT 8080
+
 static size_t	counter(char const *s, char c)
 {
 	size_t	counts;
@@ -194,7 +195,7 @@ int	get_soc(void)
 	}
 	if (bind(soc, (struct sockaddr *)&server, sizeof(server)) == -1)
 	{
-		printf("bind\n");
+		perror("bind\n");
 		exit (1);
 	}
 	return (soc);
