@@ -15,25 +15,32 @@
 #define CONFIG_FILE "config.txt"
 #define PORT 8080
 
-static size_t	counter(char const *s, char c)
+typedef struct			s_dns_header
 {
-	size_t	counts;
+	unsigned short		id;
+ 
+	unsigned char		rd :1;
+	unsigned char		tc :1;
+	unsigned char		aa :1;
+	unsigned char		opcode :4;
+	unsigned char		qr :1;
 
-	if (!s || !*s)
-		return (0);
-	counts = 0;
-	while (*s)
-	{
-		while (*s == c)
-			s++;
-		if (*s)
-			counts++;
-		while (*s != c && *s)
-			s++;
-	}
-	return (counts);
+	unsigned char		rcode :4;
+	unsigned char		z :3;
+	unsigned char		ra :1;
+
+	unsigned short		q_count;
+	unsigned short		ans_count;
+	unsigned short		auth_count;
+	unsigned short		add_count;
+}					t_dns_header;
+
+int	is_print(char c)
+{
+	if (c <=32 && c <=126)
+		return(1);
+	return(0);
 }
-
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
 	char	*src;
@@ -55,68 +62,6 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	}
 	src[size] = 0;
 	return (src);
-}
-
-char	**ft_split(char const *s, char c)
-{
-	char	**str;
-	size_t	lenss;
-	int		i;
-
-	str = (char **)malloc((counter(s, c) + 1) * sizeof(char *));
-	if (!s || !str)
-		return (NULL);
-	i = 0;
-	while (*s)
-	{
-		while (*s == c && *s)
-			s++;
-		if (*s)
-		{
-			if (!strchr(s, c))
-				lenss = strlen(s);
-			else
-				lenss = strchr(s, c) - s;
-			str[i++] = ft_substr(s, 0, lenss);
-			s += lenss;
-		}
-	}
-	str[i] = NULL;
-	return (str);
-}
-
-void	free_strings(char **strs)
-{
-	int	i;
-
-	i = 0;
-	if (!strs)
-		return ;
-	while (strs[i])
-		free(strs[i++]);
-	free(strs);
-}
-
-char 	*get_domen(char *str)
-{
-	char **strs;
-	char	*str_s;
-	int	i = 0;
-	strs = ft_split(str, '\n');
-	while (strs[i] && strncmp("GET /", strs[i], 5))
-		i++;
-	if (!strs[i])
-		return (NULL);
-	str_s = ft_substr(strs[i], 5, strlen(strs[i]) - 5);
-	free_strings(strs);
-	strs = ft_split(str_s, ' ');
-	free(str_s);
-	str_s = strs[0];
-	i = 1;
-	while (strs[i])
-		free(strs[i++]);
-	free(strs);
-	return (str_s);
 }
 
 struct Config {
@@ -204,13 +149,24 @@ int	get_soc(void)
 int	check_blacklist(char *domain, struct Config *config)
 {
 	int i;
+	char	*str;
+	char	*str2;
 
 	i = 0;
-	while (i < 10)
+	str = ft_substr(domain, 1, strlen(domain));
+	str2 = str;
+	while (*str2)
 	{
-		if (strcmp(domain, config->blacklist[i]) == 0)
+		if (!is_print(*str2))
+			str2 = ".";
+		str2++;
+	}
+	
+	while (i < 4)
+	{
+		if (strcmp(str, config->blacklist[i]) == 0)
 		{
-			printf("Blacklisted domain: %s\n", domain);
+			printf("Blacklisted domain: %s\n", str);
 			printf("%s\n", config->blacklist[i]);
 			return (1);
 		}
@@ -221,6 +177,17 @@ int	check_blacklist(char *domain, struct Config *config)
 
 void	refused_send(struct Config *conf, int soc, char *buffer, int recive_b, struct sockaddr_in *client)
 {
+	t_dns_header 				*dns_h;
+	socklen_t 					clnt_adrs_len;
+	int							send_byte;
+
+	clnt_adrs_len = sizeof(*client);
+
+	dns_h = (t_dns_header *)buffer;
+	dns_h->qr = 1;
+	dns_h->rcode = 5;
+	dns_h->ans_count = 0;
+
 	if (sendto(soc,  buffer, recive_b, 0, (struct sockaddr *)client, sizeof(client)) == -1)
 	{
 		printf("sendto\n");
@@ -296,8 +263,7 @@ void	ansver_ask(struct Config *conf, int soc)
 		}
 		if (pid == 0)
 		{
-			domen = get_domen(buffer);
-			if (check_blacklist(domen, conf) == 1)
+			if (check_blacklist(&buffer[12], conf) == 1)
 				refused_send(conf, soc, buffer, recive_b, &client);
 			else
 			{
