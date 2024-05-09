@@ -1,8 +1,8 @@
-NAME		:=	Bureaucrat
+NAME		:=	Serializer
 
 CC			:=	c++
 
-SRCS		:=	main.cpp Bureaucrat.cpp AForm.cpp PresidentialPardonForm.cpp RobotomyRequestForm.cpp ShrubberyCreationForm.cpp
+SRCS		:=	main.cpp Serializer.cpp
 
 OBJ			:=	$(SRCS:.cpp=.o)
 

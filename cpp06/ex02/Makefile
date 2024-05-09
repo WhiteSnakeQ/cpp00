@@ -1,8 +1,8 @@
-NAME		:=	Bureaucrat
+NAME		:=	Cast
 
 CC			:=	c++
 
-SRCS		:=	main.cpp Bureaucrat.cpp AForm.cpp PresidentialPardonForm.cpp RobotomyRequestForm.cpp ShrubberyCreationForm.cpp
+SRCS		:=	main.cpp A.cpp B.cpp C.cpp Base.cpp
 
 OBJ			:=	$(SRCS:.cpp=.o)
 

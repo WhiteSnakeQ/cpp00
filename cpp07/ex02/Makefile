@@ -1,8 +1,8 @@
-NAME		:=	Bureaucrat
+NAME		:=	array
 
 CC			:=	c++
 
-SRCS		:=	main.cpp Bureaucrat.cpp AForm.cpp PresidentialPardonForm.cpp RobotomyRequestForm.cpp ShrubberyCreationForm.cpp
+SRCS		:=	main.cpp
 
 OBJ			:=	$(SRCS:.cpp=.o)
 

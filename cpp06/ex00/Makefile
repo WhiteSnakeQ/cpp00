@@ -1,8 +1,8 @@
-NAME		:=	Bureaucrat
+NAME		:=	Convert
 
 CC			:=	c++
 
-SRCS		:=	main.cpp Bureaucrat.cpp AForm.cpp PresidentialPardonForm.cpp RobotomyRequestForm.cpp ShrubberyCreationForm.cpp
+SRCS		:=	main.cpp ScalarConverter.cpp
 
 OBJ			:=	$(SRCS:.cpp=.o)
 
